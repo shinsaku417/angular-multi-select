@@ -137,7 +137,6 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
       var helperItemsLength = 0;
       $scope.clearButtonText = $scope.clearButtonText || 'Select None';
 
-      //$scope.inputModel = $scope.$eval(attrs.inputModel);
       function throttle(fn, threshhold, scope) {
         threshhold = threshhold || 250;
         var last;
