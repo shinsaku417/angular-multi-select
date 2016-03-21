@@ -64,7 +64,6 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
       groupProperty: '@',
       maxHeight: '@',
       maxSelectedItems: '=',
-      shallowCopy: '@',
 
       // callbacks
       onClose: '&',
@@ -78,25 +77,25 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
     '</button>' +
     '<div class="checkboxLayer">' +
     '<form>' +
-    '<div class="helperContainer" ng-show="displayHelper( \'filter\' ) || displayHelper( \'all\' ) || displayHelper( \'none\' ) || displayHelper( \'reset\' )">' +
-    '<div class="line" ng-show="displayHelper( \'all\' ) || displayHelper( \'none\' ) || displayHelper( \'reset\' )">' +
-    '<button type="button" ng-click="::select( \'all\',   $event );"    class="helperButton" ng-show="!isDisabled && displayHelper( \'all\' )">   &#10003;&nbsp; Select All</button> ' +
-    '<button type="button" ng-click="::select( \'none\',  $event );"   class="helperButton" ng-show="!isDisabled && displayHelper( \'none\' )">  &times;&nbsp; {{clearButtonText}}</button>' +
-    '<button type="button" ng-click="::select( \'reset\', $event );"  class="helperButton" ng-show="!isDisabled && displayHelper( \'reset\' )" style="float:right">&#8630;&nbsp; Reset</button>' +
-    '<button type="button" ng-click="::select( \'done\',  $event );"   class="helperButton helperButtonDone" ng-show="!isDisabled && displayHelper( \'done\' )" style="float:right">&nbsp;&nbsp;Done&nbsp;&nbsp;</button>' +
+    '<div class="helperContainer" ng-if="displayHelper( \'filter\' ) || displayHelper( \'all\' ) || displayHelper( \'none\' ) || displayHelper( \'reset\' )">' +
+    '<div class="line" ng-if="displayHelper( \'all\' ) || displayHelper( \'none\' ) || displayHelper( \'reset\' )">' +
+    '<button type="button" ng-click="::select( \'all\',   $event );"    class="helperButton" ng-if="!isDisabled && displayHelper( \'all\' )">   &#10003;&nbsp; Select All</button> ' +
+    '<button type="button" ng-click="::select( \'none\',  $event );"   class="helperButton" ng-if="!isDisabled && displayHelper( \'none\' )">  &times;&nbsp; {{clearButtonText}}</button>' +
+    '<button type="button" ng-click="::select( \'reset\', $event );"  class="helperButton" ng-if="!isDisabled && displayHelper( \'reset\' )" style="float:right">&#8630;&nbsp; Reset</button>' +
+    '<button type="button" ng-click="::select( \'done\',  $event );"   class="helperButton helperButtonDone" ng-if="!isDisabled && displayHelper( \'done\' )" style="float:right">&nbsp;&nbsp;Done&nbsp;&nbsp;</button>' +
     '</div>' +
-    '<div class="line" style="position:relative" ng-show="::displayHelper( \'filter\' )">' +
+    '<div class="line" style="position:relative" ng-if="::displayHelper( \'filter\' )">' +
     '<input placeholder="Search..." type="text" ng-click="::select( \'filter\', $event )" data-ng-model-options="{debounce: 300}" ng-model="inputLabel.labelFilter" ng-change="::throttledUpdateFilter();$scope.getFormElements();" class="inputFilter" />' +
     '<button type="button" class="clearButton" ng-click="::inputLabel.labelFilter=\'\';updateFilter();prepareGrouping();prepareIndex();select( \'clear\', $event )">&times;</button> ' +
     '</div>' +
     '</div>' +
     '<div class="checkBoxContainer" data-subfilter="::filteredModel" ng-style="{\'max-height\':setHeight()}" style="overflow-y:scroll">' +
-    '<div ng-repeat="item in subFilteredModel track by $index  | filter:removeGroupEndMarker" class="multiSelectItem"' +
+    '<div ng-repeat="item in subFilteredModel | filter:removeGroupEndMarker" class="multiSelectItem"' +
     'ng-class="{selected: item[ tickProperty ], horizontal: orientationH, vertical: orientationV, multiSelectGroup:item[ groupProperty ], disabled:itemIsDisabled( item )}"' +
     'ng-click="::syncItems( item, $event, $index );"' +
     'ng-mouseleave="::removeFocusStyle( tabIndex );"' +
     'style="position:absolute;top:0;transform:translate(0,{{item.displayIndex*31}}px);-webkit-transform:translate(0,{{item.displayIndex*31}}px);" ng-style="{\'-ms-transform\':transformFixIE(item.displayIndex)}">' +
-    '<div class="acol" ng-show="item[ spacingProperty ] > 0" ng-repeat="i in numberToArray( item[ spacingProperty ] ) track by $index">&nbsp;</div>' +
+    '<div class="acol" ng-if="item[ spacingProperty ] > 0" ng-repeat="i in numberToArray( item[ spacingProperty ] ) track by $index">&nbsp;</div>' +
     '<div class="acol">' +
     '<label>' +
     '<input class="checkbox focusable" type="checkbox" ng-disabled="itemIsDisabled( item )" ng-checked="item[ tickProperty ]" ng-click="::syncItems( item, $event, $index )" />' +
@@ -104,7 +103,7 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
     '</label>' +
     '</div>' +
     '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
-    '<span class="tickMark" ng-show="item[ groupProperty ] !== true && item[ tickProperty ] === true">&#10004;</span>' +
+    '<span class="tickMark" ng-if="item[ groupProperty ] !== true && item[ tickProperty ] === true">&#10004;</span>' +
     '</div>' +
     '</div>' +
     '</form>' +
@@ -131,10 +130,10 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
       $scope.formElements = [];
       $scope.tabIndex = 0;
       $scope.clickedItem = null;
-      $scope.deepCopyDisabled = (attrs.shallowCopy === 'true');
       var prevTabIndex = 0;
       var helperItems = [];
       var helperItemsLength = 0;
+
       $scope.clearButtonText = $scope.clearButtonText || 'Select None';
 
       function throttle(fn, threshhold, scope) {
@@ -278,27 +277,27 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
         if (attrs.selectionMode && $scope.selectionMode.toUpperCase() === 'SINGLE') {
 
           switch (elementString.toUpperCase()) {
-          case 'ALL':
-            return false;
-          case 'NONE':
-            return false;
-          case 'RESET':
-            if (typeof attrs.helperElements === 'undefined') {
-              return true;
-            } else if (attrs.helperElements && $scope.helperElements.toUpperCase().indexOf('RESET') >= 0) {
-              return true;
-            }
-            break;
-          case 'FILTER':
-            if (typeof attrs.helperElements === 'undefined') {
-              return true;
-            }
-            if (attrs.helperElements && $scope.helperElements.toUpperCase().indexOf('FILTER') >= 0) {
-              return true;
-            }
-            break;
-          default:
-            break;
+            case 'ALL':
+              return false;
+            case 'NONE':
+              return false;
+            case 'RESET':
+              if (typeof attrs.helperElements === 'undefined') {
+                return true;
+              } else if (attrs.helperElements && $scope.helperElements.toUpperCase().indexOf('RESET') >= 0) {
+                return true;
+              }
+              break;
+            case 'FILTER':
+              if (typeof attrs.helperElements === 'undefined') {
+                return true;
+              }
+              if (attrs.helperElements && $scope.helperElements.toUpperCase().indexOf('FILTER') >= 0) {
+                return true;
+              }
+              break;
+            default:
+              break;
           }
 
           return false;
@@ -429,14 +428,11 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
         } else { // single item click
           clickElement(index, e);
         }
-        if ($scope.deepCopyDisabled) {
-          $scope.clickedItem = _.clone(item);
-        } else {
-          $scope.clickedItem = angular.copy(item);
-        }
+
+        $scope.clickedItem = angular.copy(item);
 
         // We update the index here
-        prevTabIndex = $scope.tabIndex;
+        prevTabIndex = $scope.tabIndex || 0;
         $scope.tabIndex = ng_repeat_index + helperItemsLength;
 
         // Set focus on the hidden checkbox
@@ -477,7 +473,7 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
       // this variable is used in $scope.outputModel and to refresh the button label
       $scope.refreshSelectedItems = function() {
         $scope.selectedItems = [];
-        _.forEach($scope.inputModel, function(value/*, key*/) {
+        angular.forEach($scope.inputModel, function(value/*, key*/) {
           if (typeof value !== 'undefined') {
             if (typeof value[ $scope.groupProperty ] === 'undefined') {
               if (value[ $scope.tickProperty ] === true) {
@@ -491,17 +487,8 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
       // refresh output model as well
       $scope.refreshOutputModel = function() {
         if (typeof attrs.outputModel !== 'undefined') {
-          if ($scope.deepCopyDisabled) {
-            $scope.outputModel = _.clone($scope.selectedItems);
-            _.forEach($scope.outputModel, function(value/*, key*/) {
-              // remove the index number and spacing number from output model
-              delete value[ $scope.indexProperty ];
-              delete value[ $scope.spacingProperty ];
-            });
-            return;
-          }
           $scope.outputModel = angular.copy($scope.selectedItems);
-          _.forEach($scope.outputModel, function(value/*, key*/) {
+          angular.forEach($scope.outputModel, function(value/*, key*/) {
             // remove the index number and spacing number from output model
             delete value[ $scope.indexProperty ];
             delete value[ $scope.spacingProperty ];
@@ -534,11 +521,11 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
             var fnName = $scope.selectedLabelRenderer;
             $scope.varButtonLabel = $scope.$parent.fn[fnName].call(undefined, $scope.selectedItems);
           } else {
-            _.forEach($scope.selectedItems, function(value/*, key*/) {
+            angular.forEach($scope.selectedItems, function(value/*, key*/) {
               if (typeof value !== 'undefined') {
                 if (ctr < tempMaxLabels) {
                   $scope.varButtonLabel += ( $scope.varButtonLabel.length > 0 ? '</div>, <div class="buttonLabel">' : '<div class="buttonLabel">') + $scope.writeLabel(value,
-                    'buttonLabel');
+                      'buttonLabel');
                 }
                 ctr++;
               }
@@ -575,11 +562,11 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
         var classes = $scope.displayClasses ? $scope.displayClasses.split(' ') : [];
 
         // iterate through labels : temp == [name,id];
-        _.forEach(temp, function(value2, key2) {
+        angular.forEach(temp, function(value2, key2) {
           if (typeof value2 !== 'undefined') {
 
             // iterate through selected items in filtered array : item == current object in filteredArray
-            _.forEach(item, function(value1, key1) {
+            angular.forEach(item, function(value1, key1) {
               if (key1 == value2) { //eslint-disable-line eqeqeq
                 label += '&nbsp;' + (classes[key2] ? '<span class="' + classes[key2] + '" >' + value1 + '</span>' : value1);
               }
@@ -723,43 +710,43 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
         $scope.tabIndex = helperIndex;
 
         switch (type.toUpperCase()) {
-        case 'ALL':
-          _.forEach($scope.filteredModel, function(value/*, key*/) {
-            if (typeof value !== 'undefined' && value[ $scope.disableProperty ] !== true) {
-              if (typeof value[ $scope.groupProperty ] === 'undefined') {
-                value[ $scope.tickProperty ] = true;
+          case 'ALL':
+            angular.forEach($scope.filteredModel, function(value/*, key*/) {
+              if (typeof value !== 'undefined' && value[ $scope.disableProperty ] !== true) {
+                if (typeof value[ $scope.groupProperty ] === 'undefined') {
+                  value[ $scope.tickProperty ] = true;
+                }
               }
-            }
-            $scope.onSelectAllClick();
-          });
-          break;
-        case 'NONE':
-          _.forEach($scope.filteredModel, function(value/*, key*/) {
-            if (typeof value !== 'undefined' && value[ $scope.disableProperty ] !== true) {
-              if (typeof value[ $scope.groupProperty ] === 'undefined') {
-                value[ $scope.tickProperty ] = false;
+              $scope.onSelectAllClick();
+            });
+            break;
+          case 'NONE':
+            angular.forEach($scope.filteredModel, function(value/*, key*/) {
+              if (typeof value !== 'undefined' && value[ $scope.disableProperty ] !== true) {
+                if (typeof value[ $scope.groupProperty ] === 'undefined') {
+                  value[ $scope.tickProperty ] = false;
+                }
               }
-            }
-          });
-          break;
-        case 'RESET':
-          _.forEach($scope.filteredModel, function(value/*, key*/) {
-            if (typeof value[ $scope.groupProperty ] === 'undefined' && typeof value !== 'undefined' && value[ $scope.disableProperty ] !== true) {
-              temp = value[ $scope.indexProperty ];
-              value[ $scope.tickProperty ] = $scope.backUp[ temp ][ $scope.tickProperty ];
-            }
-          });
-          break;
-        case 'CLEAR':
-          $scope.tabIndex = $scope.tabIndex + 1;
-          break;
-        case 'FILTER':
-          $scope.tabIndex = helperItems.length - 1;
-          break;
-        case 'DONE':
-          $scope.toggleCheckboxes(e);
-          break;
-        default:
+            });
+            break;
+          case 'RESET':
+            angular.forEach($scope.filteredModel, function(value/*, key*/) {
+              if (typeof value[ $scope.groupProperty ] === 'undefined' && typeof value !== 'undefined' && value[ $scope.disableProperty ] !== true) {
+                temp = value[ $scope.indexProperty ];
+                value[ $scope.tickProperty ] = $scope.backUp[ temp ][ $scope.tickProperty ];
+              }
+            });
+            break;
+          case 'CLEAR':
+            $scope.tabIndex = $scope.tabIndex + 1;
+            break;
+          case 'FILTER':
+            $scope.tabIndex = helperItems.length - 1;
+            break;
+          case 'DONE':
+            $scope.toggleCheckboxes(e);
+            break;
+          default:
         }
       };
 
@@ -776,7 +763,7 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
       // count leading spaces
       $scope.prepareGrouping = function() {
         var spacing = 0;
-        _.forEach($scope.filteredModel, function(value/*, key*/) {
+        angular.forEach($scope.filteredModel, function(value/*, key*/) {
           value[ $scope.spacingProperty ] = spacing;
           if (value[ $scope.groupProperty ] === true) {
             spacing += 2;
@@ -789,7 +776,7 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
       // prepare original index
       $scope.prepareIndex = function() {
         var ctr = 0;
-        _.forEach($scope.filteredModel, function(value/*, key*/) {
+        angular.forEach($scope.filteredModel, function(value/*, key*/) {
           value[ $scope.indexProperty ] = ctr;
           ctr++;
         });
@@ -807,7 +794,7 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
         } else if (key === 40 || key === 39 || ( !e.shiftKey && key == 9 )) { // eslint-disable-line eqeqeq
           // next element ( tab [9], down [40] & right [39] key )
           isNavigationKey = true;
-          prevTabIndex = $scope.tabIndex;
+          prevTabIndex = $scope.tabIndex || 0;
           $scope.tabIndex++;
           if ($scope.tabIndex > $scope.formElements.length - 1) {
             $scope.tabIndex = 0;
@@ -822,7 +809,7 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
         } else if (key === 38 || key === 37 || ( e.shiftKey && parseInt(key, 10) === 9 )) {
           // prev element ( shift+tab, up[38] & left[37] key )
           isNavigationKey = true;
-          prevTabIndex = $scope.tabIndex;
+          prevTabIndex = $scope.tabIndex || 0;
           $scope.tabIndex--;
           if ($scope.tabIndex < 0) {
             $scope.tabIndex = $scope.formElements.length - 1;
@@ -909,7 +896,6 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
       // watch1, for changes in input model property
       // updates multi-select when user select/deselect a single checkbox programatically
       // https://github.com/isteven/angular-multi-select/issues/8
-
       $scope.$watch('inputModel', function(newVal) {
 
         if (newVal) {
@@ -926,7 +912,7 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
           if ($scope.maxSelectedItems) {
             var shouldDisableItem = $scope.selectedItems && $scope.selectedItems.length >= $scope.maxSelectedItems;
 
-            _.forEach($scope.inputModel, function(item) {
+            angular.forEach($scope.inputModel, function(item) {
               if (!item[$scope.tickProperty]) {
                 item[$scope.disableProperty] = shouldDisableItem;
               }
@@ -938,13 +924,9 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
       // watch2 for changes in input model as a whole
       // this on updates the multi-select when a user load a whole new input-model. We also update the $scope.backUp variable
       $scope.$watch('inputModel', function(newVal) {
+
         if (newVal) {
-          $scope.inputModel = $scope.$eval(newVal);
-          if ($scope.deepCopyDisabled) {
-            $scope.backUp = _.clone($scope.inputModel);
-          } else {
-            $scope.backUp = angular.copy($scope.inputModel);
-          }
+          $scope.backUp = angular.copy($scope.inputModel);
           $scope.updateFilter();
           $scope.prepareGrouping();
           $scope.prepareIndex();
@@ -998,10 +980,10 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
   var rowHeight = 31;
   var showMax = 10;
 
-  var link = function($scope, element) {
+  function link($scope, element) {
     var longest = 0;
 
-    var throttle = function(fn, threshhold, scope) {
+    function throttle(fn, threshhold, scope) {
       threshhold = threshhold || 250;
       var last;
       var deferTimer;
@@ -1022,16 +1004,16 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
           fn.apply(context, args);
         }
       };
-    };
+    }
 
     var lastScrollPosition = 0;
 
-    var setAllWidthsTo = function(widthValue) {
+    function setAllWidthsTo(widthValue) {
       var $multiSelectItems = $(element).parent().find('.multiSelectItem');
       for (var i = 0; i < $multiSelectItems.length; i++) {
         $($multiSelectItems[i]).width(widthValue);
       }
-    };
+    }
 
     $(element).parent().scope().$watch('filteredModel', function(newVal) {
 
@@ -1081,10 +1063,9 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
       $(element).off('scroll');
       $(element).on('scroll', throttledScroll);
 
-
     });
 
-  };
+  }
   return {
     restrict: 'A',
     transclude:true,
