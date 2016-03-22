@@ -277,27 +277,27 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
         if (attrs.selectionMode && $scope.selectionMode.toUpperCase() === 'SINGLE') {
 
           switch (elementString.toUpperCase()) {
-            case 'ALL':
-              return false;
-            case 'NONE':
-              return false;
-            case 'RESET':
-              if (typeof attrs.helperElements === 'undefined') {
-                return true;
-              } else if (attrs.helperElements && $scope.helperElements.toUpperCase().indexOf('RESET') >= 0) {
-                return true;
-              }
-              break;
-            case 'FILTER':
-              if (typeof attrs.helperElements === 'undefined') {
-                return true;
-              }
-              if (attrs.helperElements && $scope.helperElements.toUpperCase().indexOf('FILTER') >= 0) {
-                return true;
-              }
-              break;
-            default:
-              break;
+          case 'ALL':
+            return false;
+          case 'NONE':
+            return false;
+          case 'RESET':
+            if (typeof attrs.helperElements === 'undefined') {
+              return true;
+            } else if (attrs.helperElements && $scope.helperElements.toUpperCase().indexOf('RESET') >= 0) {
+              return true;
+            }
+            break;
+          case 'FILTER':
+            if (typeof attrs.helperElements === 'undefined') {
+              return true;
+            }
+            if (attrs.helperElements && $scope.helperElements.toUpperCase().indexOf('FILTER') >= 0) {
+              return true;
+            }
+            break;
+          default:
+            break;
           }
 
           return false;
@@ -710,43 +710,43 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
         $scope.tabIndex = helperIndex;
 
         switch (type.toUpperCase()) {
-          case 'ALL':
-            angular.forEach($scope.filteredModel, function(value/*, key*/) {
-              if (typeof value !== 'undefined' && value[ $scope.disableProperty ] !== true) {
-                if (typeof value[ $scope.groupProperty ] === 'undefined') {
-                  value[ $scope.tickProperty ] = true;
-                }
+        case 'ALL':
+          angular.forEach($scope.filteredModel, function(value/*, key*/) {
+            if (typeof value !== 'undefined' && value[ $scope.disableProperty ] !== true) {
+              if (typeof value[ $scope.groupProperty ] === 'undefined') {
+                value[ $scope.tickProperty ] = true;
               }
-              $scope.onSelectAllClick();
-            });
-            break;
-          case 'NONE':
-            angular.forEach($scope.filteredModel, function(value/*, key*/) {
-              if (typeof value !== 'undefined' && value[ $scope.disableProperty ] !== true) {
-                if (typeof value[ $scope.groupProperty ] === 'undefined') {
-                  value[ $scope.tickProperty ] = false;
-                }
+            }
+            $scope.onSelectAllClick();
+          });
+          break;
+        case 'NONE':
+          angular.forEach($scope.filteredModel, function(value/*, key*/) {
+            if (typeof value !== 'undefined' && value[ $scope.disableProperty ] !== true) {
+              if (typeof value[ $scope.groupProperty ] === 'undefined') {
+                value[ $scope.tickProperty ] = false;
               }
-            });
-            break;
-          case 'RESET':
-            angular.forEach($scope.filteredModel, function(value/*, key*/) {
-              if (typeof value[ $scope.groupProperty ] === 'undefined' && typeof value !== 'undefined' && value[ $scope.disableProperty ] !== true) {
-                temp = value[ $scope.indexProperty ];
-                value[ $scope.tickProperty ] = $scope.backUp[ temp ][ $scope.tickProperty ];
-              }
-            });
-            break;
-          case 'CLEAR':
-            $scope.tabIndex = $scope.tabIndex + 1;
-            break;
-          case 'FILTER':
-            $scope.tabIndex = helperItems.length - 1;
-            break;
-          case 'DONE':
-            $scope.toggleCheckboxes(e);
-            break;
-          default:
+            }
+          });
+          break;
+        case 'RESET':
+          angular.forEach($scope.filteredModel, function(value/*, key*/) {
+            if (typeof value[ $scope.groupProperty ] === 'undefined' && typeof value !== 'undefined' && value[ $scope.disableProperty ] !== true) {
+              temp = value[ $scope.indexProperty ];
+              value[ $scope.tickProperty ] = $scope.backUp[ temp ][ $scope.tickProperty ];
+            }
+          });
+          break;
+        case 'CLEAR':
+          $scope.tabIndex = $scope.tabIndex + 1;
+          break;
+        case 'FILTER':
+          $scope.tabIndex = helperItems.length - 1;
+          break;
+        case 'DONE':
+          $scope.toggleCheckboxes(e);
+          break;
+        default:
         }
       };
 
