@@ -1,0 +1,33 @@
+{
+  "name": "neustar-multi-select",
+  "version": "3.0.0",
+  "description": "multi-select for neustar forked from isteven's version",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-eslint": "^5.0.0-beta9",
+    "eslint": "^1.10.3",
+    "eslint-plugin-react": "^3.16.1"
+  },
+  "peerDependencies": {
+    "angular": "~1.3.7"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnwun/angular-multi-select.git"
+  },
+  "keywords": [
+    "angular",
+    "multi",
+    "select"
+  ],
+  "author": "Johnwun, isteven",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/johnwun/angular-multi-select/issues"
+  },
+  "homepage": "https://github.com/johnwun/angular-multi-select#readme"
+}
