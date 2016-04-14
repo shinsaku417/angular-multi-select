@@ -79,10 +79,10 @@ angular.module('multi-select', ['ng']).directive('multiSelect', [ '$sce', '$time
     '<form>' +
     '<div class="helperContainer" ng-if="displayHelper( \'filter\' ) || displayHelper( \'all\' ) || displayHelper( \'none\' ) || displayHelper( \'reset\' )">' +
     '<div class="line" ng-if="displayHelper( \'all\' ) || displayHelper( \'none\' ) || displayHelper( \'reset\' )">' +
-    '<button type="button" ng-click="::select( \'all\',   $event );"    class="helperButton" ng-if="!isDisabled && displayHelper( \'all\' )">   &#10003;&nbsp; Select All</button> ' +
-    '<button type="button" ng-click="::select( \'none\',  $event );"   class="helperButton" ng-if="!isDisabled && displayHelper( \'none\' )">  &times;&nbsp; {{clearButtonText}}</button>' +
-    '<button type="button" ng-click="::select( \'reset\', $event );"  class="helperButton" ng-if="!isDisabled && displayHelper( \'reset\' )" style="float:right">&#8630;&nbsp; Reset</button>' +
-    '<button type="button" ng-click="::select( \'done\',  $event );"   class="helperButton helperButtonDone" ng-if="!isDisabled && displayHelper( \'done\' )" style="float:right">&nbsp;&nbsp;Done&nbsp;&nbsp;</button>' +
+    '<button type="button" ng-click="::select( \'all\',   $event );"    class="helperButton" ng-if="!isDisabled && displayHelper( \'all\' )">   &#10003;&nbsp; <span data-translate="Select All"></span></button> ' +
+    '<button type="button" ng-click="::select( \'none\',  $event );"   class="helperButton" ng-if="!isDisabled && displayHelper( \'none\' )">  &times;&nbsp; <span data-translate="{{clearButtonText}}"></span></button>' +
+    '<button type="button" ng-click="::select( \'reset\', $event );"  class="helperButton" ng-if="!isDisabled && displayHelper( \'reset\' )" style="float:right">&#8630;&nbsp; <span data-translate="Reset"></span></button>' +
+    '<button type="button" ng-click="::select( \'done\',  $event );"   class="helperButton helperButtonDone" ng-if="!isDisabled && displayHelper( \'done\' )" style="float:right">&nbsp;&nbsp;<span data-translate="Done"></span>&nbsp;&nbsp;</button>' +
     '</div>' +
     '<div class="line" style="position:relative" ng-if="::displayHelper( \'filter\' )">' +
     '<input placeholder="Search..." type="text" ng-click="::select( \'filter\', $event )" data-ng-model-options="{debounce: 300}" ng-model="inputLabel.labelFilter" ng-change="::throttledUpdateFilter();$scope.getFormElements();" class="inputFilter" />' +
